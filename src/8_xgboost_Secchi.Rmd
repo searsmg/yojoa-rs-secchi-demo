@@ -1,6 +1,6 @@
 ---
 title: "xgboost algorithm for Secchi"
-author: "B Steele"
+author: "B Steele w/Edits from Matt Ross"
 date: "2023-04-03"
 output: html_document
 ---
@@ -17,7 +17,12 @@ model_dir = 'data/models/'
 
 # Purpose
 
-This script is a rough draft applying the `xgboost` algorithm to the Yojoa remote sensing and Secchi data. We also use a myriad of climate covariates from the ERA5 climate data in this analysis.
+The original purpose of this script is to apply applying the `xgboost` algorithm 
+to Remote Sensing Imagery of Lake Yojoa in Honduras, to estimate Yojoa water clarity. 
+You can read more about this lake [here](https://www.sciencedirect.com/science/article/pii/S0048969722015479). We
+have slightly adopted the code to become a teaching demo on how to use machine learning
+algorithms. We also use a myriad of climate covariates 
+from the ERA5 climate data in this analysis.
 
 ## Load matchup data
 
@@ -25,10 +30,9 @@ This script is a rough draft applying the `xgboost` algorithm to the Yojoa remot
 #list all the files in the match directory
 match = list.files(match_dir)
 
-#load them into the enivronment
+#load the three day matchup file. 
 sameDay = read.csv(file.path(match_dir, match[grepl('same', match)]))
 oneDay = read.csv(file.path(match_dir, match[grepl('one', match)]))
-twoDay = read.csv(file.path(match_dir, match[grepl('two', match)]))
 threeDay = read.csv(file.path(match_dir, match[grepl('three', match)]))
 fiveDay = read.csv(file.path(match_dir, match[grepl('five', match)]))
 
@@ -51,9 +55,9 @@ prepData = function(df) {
            BR= med_Blue_corr/med_Red_corr)
 }
 
+
 sameDay <- prepData(sameDay)
 oneDay <- prepData(oneDay)
-twoDay <- prepData(twoDay)
 threeDay <- prepData(threeDay)
 fiveDay <- prepData(fiveDay)
 ```
