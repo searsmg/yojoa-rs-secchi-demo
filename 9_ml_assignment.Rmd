@@ -1,4 +1,11 @@
 ---
+title: "9_assignment"
+author: "Matthew Ross"
+date: "2023-04-10"
+output: html_document
+---
+
+---
 title: "xgboost algorithm for Secchi"
 author: "B Steele w/Edits from Matt Ross"
 date: "2023-04-03"
@@ -26,6 +33,9 @@ from the ERA5 climate data in this analysis.
 
 You can read more about xgboost all over the internet, but I like the 
 kaggle [demo](https://www.kaggle.com/code/rtatman/machine-learning-with-xgboost-in-r/notebook)
+
+
+# Data Prep and Demo
 
 ## Load matchup data
 
@@ -128,9 +138,9 @@ And now train the model
 #set the parameters of the boost algo
 params <- list(booster = "gbtree", 
                objective = "reg:squarederror", 
-               eta=0.01, 
+               eta=0.05, 
                gamma=0.5, 
-               max_depth=3, 
+               max_depth=5, 
                min_child_weight=2, 
                subsample=1, 
                colsample_bytree=1)
@@ -247,3 +257,91 @@ ggplot(preds_fd_bm5_play, aes(x = secchi, y = predicted_fd_bm5)) +
   theme(plot.title = element_text(hjust = 0.5, face = 'bold'),
         plot.subtitle = element_text(hjust = 0.5))
 ```
+
+
+# Assignment
+
+
+## Hyperparameter tuning
+
+For any machine learning pipeline, one of the things we can sink
+the most time into is trying to tune our so called "hyperparameters" that alter how the ML algorithm "learns" from
+the data. Hypertuning, can improve model performance substantially,
+but it also can be a huge time-suck where model performance is
+capped. Above you see some parameter differences between two
+models and we have outputs where the second model performs better
+than the first. 
+
+Can you do better than the second model? Spend no more than 20 minutes
+altering the hyperparameters and see if you can get a better RMSE AND R2. Here you should use `?xgb.train` to see what parameters are available and you can look at the code above to see which ones we altered. Please use the exact visualiztion code we use above (ggplot + r2 in top right). 
+
+```{r}
+# YOUR NEW CODE HERE
+```
+
+#### Report your RMSE here
+
+
+
+### What hypertuning parameters most impacted your model performance?
+
+Here I'm just hoping you can describe the parameters that most impacted
+model performance, can you provide an explanation why this parameters
+mattered? 
+
+
+## More Columns
+
+We have kept this data fairly "narrow," not using too many columns for
+prediction. However, there is a vast array of potential Spectral Indices one can potentially use to improve model performance. Using this [site](https://github.com/awesome-spectral-indices/awesome-spectral-indices), add
+three new columns to our data with indices you think might help performance. Remember!
+You will need to add these columns to the overall data BEFORE you split it into test/train and convert those to matrices for XGB boost. 
+
+Some key words for spectral indices that might help include *chlorophyll*, *sediment*
+*turbidity* and *clarity*. 
+
+```{r}
+
+```
+
+
+### Reproduce the Validation Plot with New Indices
+
+```{r}
+
+```
+
+
+
+
+### Does adding these three spectral indices to your dataset improve results? 
+
+
+```{r}
+
+```
+
+
+## How does Random Forest Perform compared to XG Boost
+
+
+
+Gradient boosting is only one of many possible "tree" based algorithms, the most
+common form of these is an algorithm called "Random Forest." These two approaches
+work similarly, but they have underlying differences. 
+
+Can you build a new pipeline for the `randomForest` package? Using the same structure
+as above? 
+```{r}
+
+```
+
+
+
+# Bonus
+
+What ways might we be "cheating" in our approach here? Hint: I may have made a 
+mistake when splitting the data into train, test, validate. Hint 2: How does
+estimating water quality at different sites on the same day impact performance? 
+
+
