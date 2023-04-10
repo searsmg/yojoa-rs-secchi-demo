@@ -1,15 +1,10 @@
 ---
 title: "9_assignment"
-author: "Matthew Ross"
+author: "Matthew Ross, edited by Megan Sears"
 date: "2023-04-10"
 output: html_document
----
-
----
-title: "xgboost algorithm for Secchi"
-author: "B Steele w/Edits from Matt Ross"
-date: "2023-04-03"
-output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r}
@@ -18,8 +13,9 @@ library(xgboost)
 library(Metrics)
 library(ggpmisc)
 
-match_dir = 'data/matchups/'
-model_dir = 'data/models/'
+match_dir = 'data/matchups'
+#model_dir = 'data/models/'
+
 ```
 
 # Purpose
@@ -82,8 +78,6 @@ We want to predict the `secchi` value in these datasets, so let's set the `targe
 ## Identify our target (value is secchi)
 target <- 'secchi'
 ```
-
-
 
 ## Quick xgboost run on fiveDay matchups
 
@@ -276,7 +270,55 @@ Can you do better than the second model? Spend no more than 20 minutes
 altering the hyperparameters and see if you can get a better RMSE AND R2. Here you should use `?xgb.train` to see what parameters are available and you can look at the code above to see which ones we altered. Please use the exact visualiztion code we use above (ggplot + r2 in top right). 
 
 ```{r}
-# YOUR NEW CODE HERE
+#set the parameters of the boost algo
+params <- list(booster = "gbtree", 
+               objective = "reg:squarederror", 
+               eta=0.3, 
+               gamma=2, 
+               max_depth=5, 
+               min_child_weight=2, 
+               subsample=1, 
+               colsample_bytree=1)
+
+#run the boost algo with those settings
+xgb_naive_fd_bm5_play2 <- xgb.train(params = params, 
+                             data = dtrain_fd_bm5, 
+                             nrounds = 1000, 
+                             watchlist = list(train = dtrain_fd_bm5, 
+                                              val = dtest_fd_bm5), 
+                             print_every_n = 25, 
+                             early_stopping_rounds = 10, 
+                             maximize = F)
+
+preds_fd_bm5_play2 <- test_fiveDay %>% mutate(predicted_fd_bm5 = predict(xgb_naive_fd_bm5_play2, dtest_fd_bm5))
+
+evals_fd_bm5_play2 <- preds_fd_bm5_play2 %>%
+  summarise(rmse = rmse(secchi, predicted_fd_bm5),
+            mae = mae(secchi, predicted_fd_bm5),
+            mape = mape(secchi, predicted_fd_bm5),
+            bias = bias(secchi, predicted_fd_bm5),
+            p.bias = percent_bias(secchi, predicted_fd_bm5),
+            smape = smape(secchi, predicted_fd_bm5)) 
+
+# ggplot to check out 
+ggplot(preds_fd_bm5_play2, aes(x = secchi, y = predicted_fd_bm5)) + 
+  geom_point() +
+  geom_abline(color = 'grey', lty = 2) + 
+  coord_cartesian(xlim = c(0, 6.5),
+                  ylim = c(0,6.5)) +
+  stat_poly_eq(aes(label = paste(after_stat(adj.rr.label))),
+               formula = y~x, 
+               parse = TRUE, 
+               label.y = Inf, 
+               vjust = 1.3) +
+  labs(title = 'Quick xgboost - Yojoa Secchi\nfive day matchups, band and 5-day met summaries', 
+       subtitle = 'Grey dashed line is 1:1', 
+       x = 'Actual Secchi (m)', 
+       y = 'Predicted Secchi (m)')  +
+  theme_bw()+
+  theme(plot.title = element_text(hjust = 0.5, face = 'bold'),
+        plot.subtitle = element_text(hjust = 0.5))
+
 ```
 
 #### Report your RMSE here
